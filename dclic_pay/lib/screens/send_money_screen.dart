@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // Pour convertir les données JSON
 
 class SendMoneyScreen extends StatefulWidget {
   const SendMoneyScreen({Key? key}) : super(key: key);
 
   @override
-  State<SendMoneyScreen> createState() => _SendMoneyScreenState();
+  State createState() => _SendMoneyScreenState();
 }
 
 class _SendMoneyScreenState extends State<SendMoneyScreen> {
@@ -69,7 +71,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
                 // Title
                 const Center(
                   child: Text(
@@ -81,7 +82,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
                 // Select card section
                 const Text(
                   'Select Card',
@@ -103,7 +103,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 // Choose recipient section
                 const Text(
                   'Choose Recipient',
@@ -130,7 +129,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 // Recipients list
                 SizedBox(
                   height:
@@ -146,20 +144,21 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                         child: Column(
                           children: [
                             // Affichage de l'image si elle existe, sinon afficher un cercle avec l'initiale
-                            if (recipient["image"] != null)
-                              CircleAvatar(
-                                backgroundImage: AssetImage(recipient["image"]),
-                                radius: 30, // Taille de l'image du profil
-                              )
-                            else
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundColor: recipient["color"],
-                                child: Text(
-                                  recipient["name"][0],
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
+                            recipient["image"] != null
+                                ? CircleAvatar(
+                                    backgroundImage:
+                                        AssetImage(recipient["image"]),
+                                    radius: 30, // Taille de l'image du profil
+                                  )
+                                : CircleAvatar(
+                                    radius: 30,
+                                    backgroundColor: recipient["color"],
+                                    child: Text(
+                                      recipient["name"][0],
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                             const SizedBox(height: 8), // Espacement vertical
                             Text(
                               recipient["name"],
@@ -175,7 +174,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 // Amount section
                 const Text(
                   'Amount',
@@ -212,7 +210,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 // Terms and Send button
                 Row(
                   children: [
@@ -241,13 +238,11 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: termsAccepted
-                        ? () {
-                            // Logique pour envoyer de l'argent
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      'Sending \$${amountController.text}...')),
-                            );
+                        ? () async {
+                            String amount = amountController.text;
+                            String recipient =
+                                "recipient_id_or_name"; // Remplace par le destinataire sélectionné
+                            await _sendMoney(amount, recipient);
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
@@ -274,6 +269,39 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
     );
   }
 
+  Future<void> _sendMoney(String amount, String recipient) async {
+    final url = Uri.parse(
+        'https://yourapi.com/sendmoney'); // Remplace par l'URL de ton API
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'amount': amount,
+          'recipient': recipient,
+        }),
+      );
+      if (response.statusCode == 200) {
+        // Traitement en cas de succès
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sent \$${amount} to $recipient')),
+        );
+      } else {
+        // Traitement en cas d'erreur
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send money: ${response.body}')),
+        );
+      }
+    } catch (error) {
+      // Gestion des erreurs
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
+    }
+  }
+
   Widget _buildCardOption(String title, String cardType, bool isSelected) {
     return GestureDetector(
       onTap: () {
@@ -282,32 +310,28 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
         });
       },
       child: Container(
-        margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
+          color: isSelected ? Colors.blue[100] : Colors.grey[100],
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selectedCard == title ? Colors.blue : Colors.grey[300]!,
+            color: isSelected ? Colors.blue : Colors.transparent,
+            width: 1,
           ),
-          borderRadius: BorderRadius.circular(12),
-          color: selectedCard == title ? Colors.blue : Colors.white,
         ),
         child: Row(
           children: [
-            Icon(
-              cardType == 'mastercard'
-                  ? Icons.credit_card
-                  : cardType == 'visa'
-                      ? Icons.credit_card_outlined
-                      : Icons.account_balance,
-              color: selectedCard == title ? Colors.white : Colors.grey,
-              size: 20,
+            Image.asset(
+              'assets/images/$cardType.png', // Utiliser le type de carte pour l'image
+              width: 24,
+              height: 24,
             ),
             const SizedBox(width: 8),
             Text(
               title,
               style: TextStyle(
-                color: selectedCard == title ? Colors.white : Colors.grey[600],
-                fontSize: 14,
+                color: isSelected ? Colors.blue : Colors.grey[700],
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],

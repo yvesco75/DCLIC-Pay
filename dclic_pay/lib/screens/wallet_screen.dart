@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../services/card_service.dart'; // Importez CardService
+import '../services/transaction_service.dart';
+import '../models/card.dart' as my_card; // Alias pour éviter le conflit
+import '../models/transaction.dart';
+import 'package:intl/intl.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({Key? key}) : super(key: key);
@@ -11,6 +16,27 @@ class WalletScreen extends StatefulWidget {
 class _WalletScreenState extends State<WalletScreen> {
   int selectedCardIndex = 0;
   String selectedTimeRange = 'Week';
+  List<my_card.BankCard> cards = []; // Utilisation de BankCard avec l'alias
+  List<Transaction> transactions = [];
+  final CardService _cardService = CardService(); // Utilisation de CardService
+  final TransactionService _transactionService = TransactionService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    cards = await _cardService.getCards(); // Assignation correcte
+    transactions = await _transactionService.getTransactions();
+    setState(() {});
+  }
+
+  double get totalBalance {
+    return cards.fold(
+        0.0, (double sum, my_card.BankCard card) => sum + card.balance);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +66,9 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.add, color: Colors.blue),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Logique pour ajouter une carte
+                      },
                     ),
                   ),
                 ],
@@ -50,27 +78,18 @@ class _WalletScreenState extends State<WalletScreen> {
               // Cards Section
               SizedBox(
                 height: 180,
-                child: ListView(
+                child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildCard(
-                      index: 0,
-                      isPhysical: true,
-                      cardType: 'Physical debit card',
-                      balance: 2960.00,
-                      cardNumber: '**** **** **** 4826',
-                      expiry: '12/26',
-                    ),
-                    const SizedBox(width: 16),
-                    _buildCard(
-                      index: 1,
-                      isPhysical: false,
-                      cardType: 'Virtual debit card',
-                      balance: 1280.00,
-                      cardNumber: '**** **** **** 6399',
-                      expiry: '07/27',
-                    ),
-                  ],
+                  itemCount: cards.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: _buildCard(
+                        index: index,
+                        card: cards[index],
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 24),
@@ -195,6 +214,40 @@ class _WalletScreenState extends State<WalletScreen> {
                   ],
                 ),
               ),
+
+              // Display Total Balance
+              Text('Total Balance: \$${totalBalance.toStringAsFixed(2)}'),
+
+              // Transaction History
+              const Text(
+                'Transaction History',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 200, // Ajustez la hauteur selon vos besoins
+                child: ListView.builder(
+                  itemCount: transactions.length,
+                  itemBuilder: (context, index) {
+                    final transaction = transactions[index];
+                    return ListTile(
+                      title: Text(transaction.description),
+                      subtitle: Text(
+                        DateFormat('yyyy-MM-dd – kk:mm')
+                            .format(transaction.date),
+                      ),
+                      trailing:
+                          Text('\$${transaction.amount.toStringAsFixed(2)}'),
+                    );
+                  },
+                ),
+              ),
+              // Send Money Button
+              ElevatedButton(
+                onPressed: () {
+                  // Naviguer vers l'écran d'envoi d'argent
+                },
+                child: const Text('Send Money'),
+              ),
             ],
           ),
         ),
@@ -204,11 +257,7 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _buildCard({
     required int index,
-    required bool isPhysical,
-    required String cardType,
-    required double balance,
-    required String cardNumber,
-    required String expiry,
+    required my_card.BankCard card, // Utilisation de BankCard avec l'alias
   }) {
     bool isSelected = selectedCardIndex == index;
     return GestureDetector(
@@ -229,39 +278,28 @@ class _WalletScreenState extends State<WalletScreen> {
             Row(
               children: [
                 Icon(
-                  isPhysical ? Icons.credit_card : Icons.credit_card_outlined,
+                  card.isPhysical
+                      ? Icons.credit_card
+                      : Icons.credit_card_outlined,
                   color: isSelected ? Colors.white : Colors.black,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  cardType,
+                  card.cardType,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? Colors.white : Colors.grey[700],
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-            const Spacer(),
-            Text(
-              cardNumber,
-              style: TextStyle(
-                color: isSelected ? Colors.white70 : Colors.grey,
-              ),
-            ),
             const SizedBox(height: 8),
             Text(
-              'Exp: $expiry',
+              '\$${card.balance.toStringAsFixed(2)}',
               style: TextStyle(
-                color: isSelected ? Colors.white70 : Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '\$${balance.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 24,
+                color: isSelected ? Colors.white : Colors.grey[700],
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : Colors.black,
               ),
             ),
           ],
@@ -270,30 +308,24 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  Widget _buildTimeRangeButton(String text, bool isSelected) {
+  Widget _buildTimeRangeButton(String label, bool isSelected) {
     return GestureDetector(
-      onTap: () => setState(() => selectedTimeRange = text),
+      onTap: () {
+        setState(() {
+          selectedTimeRange = label;
+        });
+      },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selectedTimeRange == text ? Colors.white : Colors.transparent,
+          color: isSelected ? Colors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: selectedTimeRange == text
-              ? [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 1,
-                    offset: const Offset(0, 1),
-                  )
-                ]
-              : null,
+          border: Border.all(color: Colors.blue),
         ),
         child: Text(
-          text,
+          label,
           style: TextStyle(
-            color: selectedTimeRange == text ? Colors.blue : Colors.grey,
-            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : Colors.blue,
           ),
         ),
       ),
@@ -302,35 +334,19 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _buildSpendingRow(String label, String amount,
       {bool showSeeDetails = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              )),
-          Row(
-            children: [
-              Text(amount,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  )),
-              if (showSeeDetails) ...[
-                const SizedBox(width: 8),
-                Text('See details',
-                    style: TextStyle(
-                      color: Colors.blue[700],
-                      fontWeight: FontWeight.w500,
-                    )),
-              ]
-            ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label),
+        Text(amount),
+        if (showSeeDetails)
+          TextButton(
+            onPressed: () {
+              // Logique pour voir les détails
+            },
+            child: const Text('See details'),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

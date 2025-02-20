@@ -1,9 +1,18 @@
-import 'package:dclic_pay/screens/profil_screen.dart';
-import 'package:water_drop_nav_bar/water_drop_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:water_drop_nav_bar/water_drop_nav_bar.dart';
 import 'screens/home_screen.dart';
 import 'screens/wallet_screen.dart';
 import 'screens/send_money_screen.dart';
+import 'screens/profil_screen.dart';
+import 'services/user_service.dart';
+import 'services/card_service.dart';
+import 'services/transaction_service.dart';
+import 'services/card_service.dart'; // Importez CardService
+
+// Services globaux
+final userService = UserService();
+final cardService = CardService();
+final transactionService = TransactionService();
 
 void main() {
   runApp(const MyApp());
@@ -16,11 +25,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mon Application',
+      title: 'DClic Pay',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      home: const MainScreen(), // Assure-toi que MainScreen est importé
+      home: const MainScreen(),
     );
   }
 }
@@ -36,10 +56,10 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),
+    const HomeScreen(),
     const WalletScreen(),
     const SendMoneyScreen(),
-    ProfileScreen(),
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

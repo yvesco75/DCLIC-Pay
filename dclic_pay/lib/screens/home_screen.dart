@@ -4,13 +4,32 @@ import '../models/user.dart';
 import '../services/user_service.dart';
 import 'send_money_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final UserService _userService = UserService();
+  User? _user;
+  double _balance = 6190.00;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    _user =
+        await _userService.getCurrentUser(); // Utilisation de getCurrentUser()
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    User user = _userService.getUser();
-
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -20,15 +39,20 @@ class HomeScreen extends StatelessWidget {
               radius: 20,
               backgroundImage: AssetImage('assets/images/user_avatar.png'),
             ),
-            SizedBox(width: 10),
-            Text('Hello Sacof!', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(width: 10),
+            Text(
+              _user != null
+                  ? 'Hello ${_user!.fullName}!'
+                  : 'Hello!', // Utilisation de fullName
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(LucideIcons.search),
+            icon: const Icon(LucideIcons.search),
             onPressed: () {},
           ),
         ],
@@ -37,10 +61,10 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildBalanceCard(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildFeaturesRow(context),
             _buildActionButtons(context),
-            Divider(),
+            const Divider(),
             _buildRecentActivity(),
           ],
         ),
@@ -60,31 +84,35 @@ class HomeScreen extends StatelessWidget {
               color: Colors.black12,
               blurRadius: 8,
               spreadRadius: 2,
-              offset: Offset(0, 3),
-            )
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Sacof Account',
+                const Text('Sacof Account',
                     style: TextStyle(fontSize: 24, color: Colors.white)),
-                Text('Arian Zesan',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
+                Text(
+                  _user?.fullName ?? 'Arian Zesan', // Utilisation de fullName
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Center(
               child: Column(
                 children: [
-                  Text('\$6,190.00',
-                      style: TextStyle(fontSize: 32, color: Colors.white)),
-                  SizedBox(height: 8),
-                  Text('Total balance',
+                  Text(
+                    '\$${_balance.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 32, color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('Total balance',
                       style: TextStyle(fontSize: 16, color: Colors.white)),
                 ],
               ),
@@ -101,13 +129,13 @@ class HomeScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             'Features',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           TextButton(
             onPressed: () {},
-            child: Text(
+            child: const Text(
               'See More',
               style: TextStyle(color: Colors.blue),
             ),
@@ -133,9 +161,9 @@ class HomeScreen extends StatelessWidget {
             child: FeatureButton(
               imagePath: 'assets/images/1.png',
               text: "Send",
-              width: 50, // Taille personnalisée
+              width: 50,
               height: 30,
-              padding: 1, // Padding personnalisé
+              padding: 1,
             ),
           ),
           FeatureButton(
@@ -146,11 +174,11 @@ class HomeScreen extends StatelessWidget {
             padding: 1,
           ),
           FeatureButton(
-            imagePath: 'assets/images/1.png',
+            imagePath: 'assets/images/3.png', // Assurez-vous que l'image existe
             text: "Rewards",
             width: 50,
-            height: 20,
-            padding: 0,
+            height: 30,
+            padding: 1,
           ),
         ],
       ),
@@ -166,11 +194,11 @@ class HomeScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Recent Activity",
+              const Text("Recent Activity",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              DropdownButton<String>(
+              DropdownButton(
                 value: 'All',
-                items: <String>['All', 'Sent', 'Received', 'Top-up']
+                items: ['All', 'Sent', 'Received', 'Top-up']
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -224,17 +252,17 @@ class HomeScreen extends StatelessWidget {
 class FeatureButton extends StatelessWidget {
   final String imagePath;
   final String text;
-  final double width; // Nouveau paramètre pour la largeur du cadre
-  final double height; // Nouveau paramètre pour la hauteur du cadre
-  final double padding; // Nouveau paramètre pour le padding interne
+  final double width;
+  final double height;
+  final double padding;
 
   const FeatureButton({
     Key? key,
     required this.imagePath,
     required this.text,
-    this.width = 20, // Valeur par défaut
-    this.height = 10, // Valeur par défaut
-    this.padding = 2, // Valeur par défaut
+    this.width = 20,
+    this.height = 10,
+    this.padding = 2,
   }) : super(key: key);
 
   @override
@@ -243,19 +271,19 @@ class FeatureButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: width, // Utilisation de la largeur définie
-          height: height, // Utilisation de la hauteur définie
+          width: width,
+          height: height,
           decoration: BoxDecoration(
             color: Colors.grey[100],
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: EdgeInsets.all(padding), // Utilisation du padding défini
+            padding: EdgeInsets.all(padding),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
                 imagePath,
-                fit: BoxFit.contain, // Redimensionne l'image sans la rogner
+                fit: BoxFit.contain,
               ),
             ),
           ),
