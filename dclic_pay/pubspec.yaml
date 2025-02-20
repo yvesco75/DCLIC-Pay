@@ -34,6 +34,10 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  fl_chart: ^0.70.2
+  flutter_credit_card: ^4.0.1
+  lucide_icons: ^0.256.0
+  water_drop_nav_bar: 2.2.2
 
 dev_dependencies:
   flutter_test:
