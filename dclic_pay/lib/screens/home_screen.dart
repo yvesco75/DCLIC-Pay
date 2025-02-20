@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../models/user.dart';
 import '../services/user_service.dart';
-//import 'send_money_screen.dart';
+import 'send_money_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final UserService _userService = UserService();

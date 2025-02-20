@@ -1,8 +1,9 @@
+import 'package:dclic_pay/screens/profil_screen.dart';
 import 'package:water_drop_nav_bar/water_drop_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/wallet_screen.dart';
-//import 'screens/send_money_screen.dart';
+import 'screens/send_money_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Mon Application',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -36,7 +38,8 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     HomeScreen(),
     const WalletScreen(),
-    //const SendMoneyScreen(),
+    const SendMoneyScreen(),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
