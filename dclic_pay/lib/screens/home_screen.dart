@@ -130,10 +130,28 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => SendMoneyScreen()),
               );
             },
-            child: FeatureButton(icon: Icons.send, text: "Send"),
+            child: FeatureButton(
+              imagePath: 'assets/images/1.png',
+              text: "Send",
+              width: 50, // Taille personnalisée
+              height: 30,
+              padding: 1, // Padding personnalisé
+            ),
           ),
-          FeatureButton(icon: Icons.qr_code, text: "Scan"),
-          FeatureButton(icon: Icons.account_balance_wallet, text: "Top-up"),
+          FeatureButton(
+            imagePath: 'assets/images/2.png',
+            text: "Receive",
+            width: 50,
+            height: 30,
+            padding: 1,
+          ),
+          FeatureButton(
+            imagePath: 'assets/images/1.png',
+            text: "Rewards",
+            width: 50,
+            height: 20,
+            padding: 0,
+          ),
         ],
       ),
     );
@@ -204,29 +222,52 @@ class HomeScreen extends StatelessWidget {
 }
 
 class FeatureButton extends StatelessWidget {
-  final IconData icon;
+  final String imagePath;
   final String text;
+  final double width; // Nouveau paramètre pour la largeur du cadre
+  final double height; // Nouveau paramètre pour la hauteur du cadre
+  final double padding; // Nouveau paramètre pour le padding interne
 
   const FeatureButton({
     Key? key,
-    required this.icon,
+    required this.imagePath,
     required this.text,
+    this.width = 20, // Valeur par défaut
+    this.height = 10, // Valeur par défaut
+    this.padding = 2, // Valeur par défaut
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
+          width: width, // Utilisation de la largeur définie
+          height: height, // Utilisation de la hauteur définie
           decoration: BoxDecoration(
-            color: Colors.blue[100],
-            borderRadius: BorderRadius.circular(10),
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
           ),
-          padding: EdgeInsets.all(12),
-          child: Icon(icon, color: Colors.blue),
+          child: Padding(
+            padding: EdgeInsets.all(padding), // Utilisation du padding défini
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.contain, // Redimensionne l'image sans la rogner
+              ),
+            ),
+          ),
         ),
-        SizedBox(height: 5),
-        Text(text),
+        const SizedBox(height: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[700],
+          ),
+        ),
       ],
     );
   }

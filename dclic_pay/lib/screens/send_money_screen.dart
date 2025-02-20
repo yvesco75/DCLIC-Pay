@@ -15,14 +15,26 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
 
   // Liste des destinataires avec des images optionnelles
   final List<Map<String, dynamic>> recipients = [
-    {"name": "Miradie", "color": Colors.purple, "image": null},
+    {
+      "name": "Miradie",
+      "color": Colors.purple,
+      "image": "assets/images/avatar_1.jpeg"
+    },
     {
       "name": "Emeric",
       "color": Colors.orange,
-      "image": "assets/images/emeric.png"
+      "image": "assets/images/avatar_2.jpeg"
     },
-    {"name": "Nelly", "color": Colors.pink, "image": "assets/images/nelly.png"},
-    {"name": "Eben Ezer", "color": Colors.green, "image": null},
+    {
+      "name": "Nelly",
+      "color": Colors.pink,
+      "image": "assets/images/avatar_3.jpeg"
+    },
+    {
+      "name": "Eben Ezer",
+      "color": Colors.green,
+      "image": "assets/images/avatar_4.jpeg"
+    },
   ];
 
   @override
