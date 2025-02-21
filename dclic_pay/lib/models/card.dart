@@ -44,4 +44,6 @@ class BankCard {
       isPhysical: map['isPhysical'] ?? false, // Ajoutez cette propriété
     );
   }
+
+  get type => null;
 }

@@ -5,7 +5,6 @@ class TransactionService {
   final List<Transaction> _transactions = [];
 
   TransactionService() {
-    // Ajouter quelques transactions de test
     _addInitialTransactions();
   }
 
@@ -32,8 +31,7 @@ class TransactionService {
 
   // Obtenir toutes les transactions
   Future<List<Transaction>> getTransactions() async {
-    await Future.delayed(
-        const Duration(milliseconds: 500)); // Simuler un délai réseau
+    await Future.delayed(const Duration(milliseconds: 500));
     return _transactions;
   }
 
@@ -71,9 +69,15 @@ class TransactionService {
   // Calculer le total des dépenses pour une période
   Future<double> getTotalSpending(String period) async {
     final transactions = await getTransactionsByPeriod(period);
-    return transactions
-        .where((t) => t.type == 'expense')
-        .fold(0.0, (double sum, t) => sum + t.amount); // Correction ici
+    double total = 0.0;
+
+    for (var transaction in transactions) {
+      if (transaction.type == 'expense') {
+        total += transaction.amount;
+      }
+    }
+
+    return total;
   }
 
   // Obtenir les dépenses par catégorie
@@ -83,8 +87,9 @@ class TransactionService {
 
     for (var transaction in transactions) {
       if (transaction.type == 'expense' && transaction.category != null) {
-        categoryTotals[transaction.category!] =
-            (categoryTotals[transaction.category!] ?? 0.0) + transaction.amount;
+        final category = transaction.category!;
+        categoryTotals[category] =
+            (categoryTotals[category] ?? 0.0) + transaction.amount;
       }
     }
 

@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../services/card_service.dart'; // Importez CardService
-import '../services/transaction_service.dart';
-import '../models/card.dart' as my_card; // Alias pour éviter le conflit
-import '../models/transaction.dart';
-import 'package:intl/intl.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({Key? key}) : super(key: key);
@@ -14,29 +9,7 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  int selectedCardIndex = 0;
   String selectedTimeRange = 'Week';
-  List<my_card.BankCard> cards = []; // Utilisation de BankCard avec l'alias
-  List<Transaction> transactions = [];
-  final CardService _cardService = CardService(); // Utilisation de CardService
-  final TransactionService _transactionService = TransactionService();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    cards = await _cardService.getCards(); // Assignation correcte
-    transactions = await _transactionService.getTransactions();
-    setState(() {});
-  }
-
-  double get totalBalance {
-    return cards.fold(
-        0.0, (double sum, my_card.BankCard card) => sum + card.balance);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,211 +17,216 @@ class _WalletScreenState extends State<WalletScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Wallets',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.add, color: Colors.blue),
-                      onPressed: () {
-                        // Logique pour ajouter une carte
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Cards Section
-              SizedBox(
-                height: 180,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: cards.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: _buildCard(
-                        index: index,
-                        card: cards[index],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Total Spending Section
-              const Text(
-                'Total spending',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Time Range Selector
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildTimeRangeButton('Week', true),
-                    _buildTimeRangeButton('Month', false),
-                    _buildTimeRangeButton('Custom range', false),
+                    const Text(
+                      'Wallets',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        shape: BoxShape.circle,
+                      ),
+                      child:
+                          const Icon(Icons.add, color: Colors.blue, size: 24),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // Graph Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
+                // Cards Section
+                Row(
                   children: [
-                    SizedBox(
-                      height: 200,
-                      child: LineChart(
-                        LineChartData(
-                          gridData: FlGridData(show: false),
-                          titlesData: FlTitlesData(
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 40,
-                                getTitlesWidget: (value, meta) {
-                                  return Text('\$${value.toInt()}',
+                    _buildCard(
+                      isPhysical: true,
+                      cardType: 'Physical ebt card',
+                      balance: 2960.00,
+                      isSelected: true,
+                      cardNumber: '**** 2437 **** 2434',
+                      expiryDate: '01/28',
+                    ),
+                    const SizedBox(width: 16),
+                    _buildCard(
+                      isPhysical: false,
+                      cardType: 'Virtual ebt card',
+                      balance: 1280.00,
+                      isSelected: false,
+                      cardNumber: '**** 5563 **** 6459',
+                      expiryDate: '01/27',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                // Total Spending Section
+                const Text(
+                  'Total spending',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Time Range Selector
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildTimeRangeButton('Day', false),
+                      _buildTimeRangeButton('Week', true),
+                      _buildTimeRangeButton('Month', false),
+                      _buildTimeRangeButton('Custom range', false),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Graph Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 200,
+                        child: LineChart(
+                          LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              horizontalInterval: 100,
+                              getDrawingHorizontalLine: (value) {
+                                return FlLine(
+                                  color: Colors.grey.shade200,
+                                  strokeWidth: 1,
+                                );
+                              },
+                            ),
+                            titlesData: FlTitlesData(
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  interval: 100,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      '\$${value.toInt()}',
                                       style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12));
-                                },
+                                        color: Colors.grey.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  const days = [
-                                    'Mon',
-                                    'Tue',
-                                    'Wed',
-                                    'Thu',
-                                    'Fri',
-                                    'Sat',
-                                    'Sun'
-                                  ];
-                                  if (value.toInt() < days.length) {
-                                    return Text(days[value.toInt()],
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    const days = [
+                                      'Mon',
+                                      'Tue',
+                                      'Wed',
+                                      'Thu',
+                                      'Fri',
+                                      'Sat',
+                                      'Sun'
+                                    ];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        days[value.toInt()],
                                         style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12));
-                                  }
-                                  return const Text('');
-                                },
+                                          color: Colors.grey.shade600,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              rightTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              topTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
                               ),
                             ),
-                            rightTitles: AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            topTitles: AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
+                            borderData: FlBorderData(show: false),
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: const [
+                                  FlSpot(0, 200),
+                                  FlSpot(1, 280),
+                                  FlSpot(2, 250),
+                                  FlSpot(3, 300),
+                                  FlSpot(4, 280),
+                                  FlSpot(5, 220),
+                                  FlSpot(6, 200),
+                                ],
+                                isCurved: true,
+                                color: Colors.blue,
+                                barWidth: 2,
+                                dotData: FlDotData(
+                                  show: true,
+                                  getDotPainter:
+                                      (spot, percent, barData, index) {
+                                    return FlDotCirclePainter(
+                                      radius: 4,
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                      strokeColor: Colors.blue,
+                                    );
+                                  },
+                                ),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  color: Colors.blue.withOpacity(0.1),
+                                ),
+                              ),
+                            ],
                           ),
-                          borderData: FlBorderData(show: false),
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: [
-                                const FlSpot(0, 200),
-                                const FlSpot(1, 150),
-                                const FlSpot(2, 250),
-                                const FlSpot(3, 300),
-                                const FlSpot(4, 250),
-                                const FlSpot(5, 200),
-                                const FlSpot(6, 150),
-                              ],
-                              isCurved: true,
-                              color: Colors.blue,
-                              barWidth: 3,
-                              dotData: FlDotData(show: false),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                color: Colors.blue.withOpacity(0.1),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildSpendingRow('Weekly spend', '\$1,454.00'),
-                    _buildSpendingRow('Shopping', '\$890.00'),
-                    _buildSpendingRow('Others', '\$564.00'),
-                    const Divider(),
-                    _buildSpendingRow('Weekly income', '\$2,960.00',
-                        showSeeDetails: true),
-                  ],
-                ),
-              ),
-
-              // Display Total Balance
-              Text('Total Balance: \$${totalBalance.toStringAsFixed(2)}'),
-
-              // Transaction History
-              const Text(
-                'Transaction History',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 200, // Ajustez la hauteur selon vos besoins
-                child: ListView.builder(
-                  itemCount: transactions.length,
-                  itemBuilder: (context, index) {
-                    final transaction = transactions[index];
-                    return ListTile(
-                      title: Text(transaction.description),
-                      subtitle: Text(
-                        DateFormat('yyyy-MM-dd – kk:mm')
-                            .format(transaction.date),
+                      const SizedBox(height: 20),
+                      _buildSpendingRow('Weekly spend', '\$1,454.00'),
+                      _buildSpendingRow('Shopping', '\$890.00'),
+                      _buildSpendingRow('Others', '\$564.00'),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Divider(),
                       ),
-                      trailing:
-                          Text('\$${transaction.amount.toStringAsFixed(2)}'),
-                    );
-                  },
+                      _buildSpendingRow(
+                        'Weekly income',
+                        '\$2,960.00',
+                        showSeeDetails: true,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // Send Money Button
-              ElevatedButton(
-                onPressed: () {
-                  // Naviguer vers l'écran d'envoi d'argent
-                },
-                child: const Text('Send Money'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -256,51 +234,122 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   Widget _buildCard({
-    required int index,
-    required my_card.BankCard card, // Utilisation de BankCard avec l'alias
+    required bool isPhysical,
+    required String cardType,
+    required double balance,
+    required bool isSelected,
+    required String cardNumber,
+    required String expiryDate,
   }) {
-    bool isSelected = selectedCardIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => selectedCardIndex = index),
+    return Expanded(
       child: Container(
-        width: 300,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue : Colors.white,
-          border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey[300]!,
-          ),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.grey.shade300,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(
-                  card.isPhysical
-                      ? Icons.credit_card
-                      : Icons.credit_card_outlined,
-                  color: isSelected ? Colors.white : Colors.black,
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.white.withOpacity(0.2)
+                        : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    isPhysical ? Icons.credit_card : Icons.credit_card_outlined,
+                    color: isSelected ? Colors.white : Colors.black,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  card.cardType,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey[700],
-                    fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Text(
+                    cardType,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.grey.shade700,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text(
-              '\$${card.balance.toStringAsFixed(2)}',
+              'Number',
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey[700],
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                color: isSelected
+                    ? Colors.white.withOpacity(0.7)
+                    : Colors.grey.shade600,
+                fontSize: 12,
               ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              cardNumber,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Current balance',
+                      style: TextStyle(
+                        color: isSelected
+                            ? Colors.white.withOpacity(0.7)
+                            : Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '\$${balance.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Exp',
+                      style: TextStyle(
+                        color: isSelected
+                            ? Colors.white.withOpacity(0.7)
+                            : Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      expiryDate,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -316,16 +365,16 @@ class _WalletScreenState extends State<WalletScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.blue),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.blue,
+            color: isSelected ? Colors.white : Colors.grey.shade600,
+            fontSize: 14,
           ),
         ),
       ),
@@ -334,19 +383,42 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _buildSpendingRow(String label, String amount,
       {bool showSeeDetails = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label),
-        Text(amount),
-        if (showSeeDetails)
-          TextButton(
-            onPressed: () {
-              // Logique pour voir les détails
-            },
-            child: const Text('See details'),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontSize: 14,
+            ),
           ),
-      ],
+          Row(
+            children: [
+              Text(
+                amount,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (showSeeDetails) ...[
+                const SizedBox(width: 8),
+                Text(
+                  'See details',
+                  style: TextStyle(
+                    color: Colors.blue.shade700,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

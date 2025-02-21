@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert'; // Pour convertir les données JSON
 
 class SendMoneyScreen extends StatefulWidget {
   const SendMoneyScreen({Key? key}) : super(key: key);
 
   @override
-  State createState() => _SendMoneyScreenState();
+  _SendMoneyScreenState createState() => _SendMoneyScreenState();
 }
 
 class _SendMoneyScreenState extends State<SendMoneyScreen> {
@@ -14,35 +12,36 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
   bool termsAccepted = false;
   final TextEditingController amountController =
       TextEditingController(text: "75.00");
+  final TextEditingController searchController = TextEditingController();
+  final TextEditingController recipientController = TextEditingController();
 
-  // Liste des destinataires avec des images optionnelles
   final List<Map<String, dynamic>> recipients = [
     {
-      "name": "Miradie",
-      "color": Colors.purple,
-      "image": "assets/images/avatar_1.jpeg"
+      "name": "Sarah",
+      "avatar": "assets/images/sarah.png",
+      "color": Colors.purple[50],
     },
     {
-      "name": "Emeric",
-      "color": Colors.orange,
-      "image": "assets/images/avatar_2.jpeg"
+      "name": "Tommy",
+      "avatar": "assets/images/tommy.png",
+      "color": Colors.pink[50],
     },
     {
-      "name": "Nelly",
-      "color": Colors.pink,
-      "image": "assets/images/avatar_3.jpeg"
+      "name": "Robert",
+      "avatar": "assets/images/robert.png",
+      "color": Colors.blue[50],
     },
     {
-      "name": "Eben Ezer",
-      "color": Colors.green,
-      "image": "assets/images/avatar_4.jpeg"
+      "name": "Mike",
+      "avatar": "assets/images/mike.png",
+      "color": Colors.orange[50],
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -56,37 +55,52 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   children: [
                     Row(
                       children: [
-                        const CircleAvatar(
-                          backgroundColor: Colors.blue,
+                        CircleAvatar(
+                          backgroundColor: Colors.blue[100],
                           child:
-                              Text('S', style: TextStyle(color: Colors.white)),
+                              const Text('👨', style: TextStyle(fontSize: 20)),
                         ),
-                        const SizedBox(width: 8),
-                        const Text('Hello Sacof !',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500)),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Hello Sacof!',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
                     ),
-                    const Icon(Icons.search),
+                    CircleAvatar(
+                      backgroundColor: Colors.blue[50],
+                      child: IconButton(
+                        icon: const Icon(Icons.lock, color: Colors.blue),
+                        onPressed: () {},
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
                   ],
                 ),
+
                 const SizedBox(height: 24),
+
                 // Title
                 const Center(
                   child: Text(
-                    'Send Money',
+                    'Send money',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                // Select card section
+
+                const SizedBox(height: 24),
+
+                // Select Card Section
                 const Text(
-                  'Select Card',
+                  'Select card',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -95,71 +109,84 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildCardOption(
-                          'Physical debit card', 'mastercard', true),
-                      _buildCardOption('Virtual debit card', 'visa', false),
-                      _buildCardOption('ECB', 'ecb', false),
+                      _buildCardChip(
+                        'Physical debit card',
+                        'MC',
+                        isSelected: selectedCard == 'Physical debit card',
+                        onTap: () => setState(
+                            () => selectedCard = 'Physical debit card'),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildCardChip(
+                        'Virtual debit card',
+                        'VISA',
+                        isSelected: selectedCard == 'Virtual debit card',
+                        onTap: () =>
+                            setState(() => selectedCard = 'Virtual debit card'),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildCardChip(
+                        'Ebt',
+                        'EBT',
+                        isSelected: selectedCard == 'Ebt',
+                        onTap: () => setState(() => selectedCard = 'Ebt'),
+                      ),
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 24),
-                // Choose recipient section
+
+                // Choose Recipient Section
                 const Text(
-                  'Choose Recipient',
+                  'Choose recipient',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  controller: recipientController,
                   decoration: InputDecoration(
-                    hintText: 'Type name/telephone number here',
+                    hintText: 'Type name/card/phone number/email',
                     hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                    suffixIcon:
-                        const Icon(Icons.help_outline, color: Colors.grey),
+                    suffixIcon: Icon(Icons.lock, color: Colors.blue, size: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
+                      borderSide: BorderSide(color: Colors.grey[200]!),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
+                      borderSide: BorderSide(color: Colors.grey[200]!),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                   ),
                 ),
+
                 const SizedBox(height: 16),
-                // Recipients list
+
+                // Recipients List
                 SizedBox(
-                  height:
-                      100, // Hauteur augmentée pour mieux afficher les images
+                  height: 80,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: recipients.length,
                     itemBuilder: (context, index) {
                       final recipient = recipients[index];
                       return Padding(
-                        padding: const EdgeInsets.only(
-                            right: 16), // Espacement horizontal
+                        padding: const EdgeInsets.only(right: 16),
                         child: Column(
                           children: [
-                            // Affichage de l'image si elle existe, sinon afficher un cercle avec l'initiale
-                            recipient["image"] != null
-                                ? CircleAvatar(
-                                    backgroundImage:
-                                        AssetImage(recipient["image"]),
-                                    radius: 30, // Taille de l'image du profil
-                                  )
-                                : CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: recipient["color"],
-                                    child: Text(
-                                      recipient["name"][0],
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                            const SizedBox(height: 8), // Espacement vertical
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: recipient["color"],
+                              backgroundImage: AssetImage(recipient["avatar"]),
+                            ),
+                            const SizedBox(height: 8),
                             Text(
                               recipient["name"],
                               style: TextStyle(
@@ -173,16 +200,18 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                     },
                   ),
                 ),
+
                 const SizedBox(height: 24),
-                // Amount section
+
+                // Amount Section
                 const Text(
                   'Amount',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Center(
                   child: Column(
                     children: [
@@ -199,9 +228,9 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                         children: List.generate(
                           7,
                           (index) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
                             width: 2,
-                            height: 16,
+                            height: 12,
                             color: Colors.blue[200],
                           ),
                         ),
@@ -209,24 +238,30 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 24),
-                // Terms and Send button
+
+                // Terms and Send Button
                 Row(
                   children: [
-                    Checkbox(
-                      value: termsAccepted,
-                      onChanged: (value) {
-                        setState(() {
-                          termsAccepted = value!;
-                        });
-                      },
+                    Transform.scale(
+                      scale: 0.9,
+                      child: Checkbox(
+                        value: termsAccepted,
+                        onChanged: (value) {
+                          setState(() {
+                            termsAccepted = value ?? false;
+                          });
+                        },
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Agree with User\'s terms and conditions',
+                        'Agree with ideate\'s terms and conditions',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                          fontSize: 13,
+                          color: Colors.grey[600],
                         ),
                       ),
                     ),
@@ -235,28 +270,22 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: 48,
                   child: ElevatedButton(
-                    onPressed: termsAccepted
-                        ? () async {
-                            String amount = amountController.text;
-                            String recipient =
-                                "recipient_id_or_name"; // Remplace par le destinataire sélectionné
-                            await _sendMoney(amount, recipient);
-                          }
-                        : null,
+                    onPressed: termsAccepted ? _sendMoney : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[200], // Couleur plus claire
+                      backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      disabledBackgroundColor: Colors.grey[300],
                     ),
                     child: const Text(
-                      'Send Money',
+                      'Send money',
                       style: TextStyle(
                         fontSize: 16,
+                        fontWeight: FontWeight.w500,
                         color: Colors.white,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -269,74 +298,73 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
     );
   }
 
-  Future<void> _sendMoney(String amount, String recipient) async {
-    final url = Uri.parse(
-        'https://yourapi.com/sendmoney'); // Remplace par l'URL de ton API
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'amount': amount,
-          'recipient': recipient,
-        }),
-      );
-      if (response.statusCode == 200) {
-        // Traitement en cas de succès
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sent \$${amount} to $recipient')),
-        );
-      } else {
-        // Traitement en cas d'erreur
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send money: ${response.body}')),
-        );
-      }
-    } catch (error) {
-      // Gestion des erreurs
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
-    }
-  }
-
-  Widget _buildCardOption(String title, String cardType, bool isSelected) {
+  Widget _buildCardChip(String title, String cardType,
+      {required bool isSelected, required VoidCallback onTap}) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedCard = title;
-        });
-      },
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue[100] : Colors.grey[100],
+          color: isSelected ? Colors.blue : Colors.grey[200],
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? Colors.blue : Colors.transparent,
-            width: 1,
-          ),
         ),
         child: Row(
           children: [
-            Image.asset(
-              'assets/images/$cardType.png', // Utiliser le type de carte pour l'image
-              width: 24,
-              height: 24,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color:
+                    isSelected ? Colors.white.withOpacity(0.2) : Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                cardType,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.grey[700],
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
             const SizedBox(width: 8),
             Text(
               title,
               style: TextStyle(
-                color: isSelected ? Colors.blue : Colors.grey[700],
+                color: isSelected ? Colors.white : Colors.grey[700],
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _sendMoney() {
+    if (!termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please accept the terms and conditions')),
+      );
+      return;
+    }
+
+    final amount = double.tryParse(amountController.text);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount')),
+      );
+      return;
+    }
+
+    // Simulate sending money
+    setState(() {
+      // Update state or show loading indicator
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text('Successfully sent \$${amount.toStringAsFixed(2)}')),
     );
   }
 }

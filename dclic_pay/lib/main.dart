@@ -7,7 +7,6 @@ import 'screens/profil_screen.dart';
 import 'services/user_service.dart';
 import 'services/card_service.dart';
 import 'services/transaction_service.dart';
-import 'services/card_service.dart'; // Importez CardService
 
 // Services globaux
 final userService = UserService();
