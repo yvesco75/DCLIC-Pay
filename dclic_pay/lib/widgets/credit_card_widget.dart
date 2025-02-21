@@ -4,7 +4,7 @@ import 'package:u_credit_card/u_credit_card.dart';
 class CreditCardWidget extends StatelessWidget {
   final bool isSelected;
   final bool isPhysical;
-  final String cardType;
+  final String cardHolderName; // Renommé pour plus de clarté
   final String cardNumber;
   final String expiry;
 
@@ -12,7 +12,7 @@ class CreditCardWidget extends StatelessWidget {
     Key? key,
     required this.isSelected,
     required this.isPhysical,
-    required this.cardType,
+    required this.cardHolderName,
     required this.cardNumber,
     required this.expiry,
   }) : super(key: key);
@@ -32,7 +32,7 @@ class CreditCardWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: CreditCardUi(
-          cardHolderFullName: cardType,
+          cardHolderFullName: cardHolderName,
           cardNumber: cardNumber,
           validThru: expiry, // Assurez-vous que le format est correct (MM/YY)
           topLeftColor: Colors
@@ -41,8 +41,8 @@ class CreditCardWidget extends StatelessWidget {
               Colors.grey, // Couleur personnalisée pour le coin inférieur droit
           showValidThru: true,
           cardType: isPhysical
-              ? CardType.mastercard
-              : CardType.visa, // Utilisez les valeurs appropriées ici
+              ? CardType.credit
+              : CardType.debit, // Utilisez les types valides ici
         ),
       ),
     );

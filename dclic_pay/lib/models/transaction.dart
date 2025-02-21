@@ -15,6 +15,9 @@ class Transaction {
     this.category,
   });
 
+  // Getter pour déterminer si la transaction est un crédit
+  bool get isCredit => type == 'income';
+
   // Convertir un objet Transaction en Map
   Map<String, dynamic> toMap() {
     return {
