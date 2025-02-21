@@ -18,23 +18,33 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
   final List<Map<String, dynamic>> recipients = [
     {
       "name": "Sarah",
-      "avatar": "assets/images/sarah.png",
+      "avatar": "assets/images/avatar_1.jpeg",
       "color": Colors.purple[50],
     },
     {
       "name": "Tommy",
-      "avatar": "assets/images/tommy.png",
+      "avatar": "assets/images/avatar_2.jpeg",
       "color": Colors.pink[50],
     },
     {
       "name": "Robert",
-      "avatar": "assets/images/robert.png",
+      "avatar": "assets/images/avatar_3.jpeg",
       "color": Colors.blue[50],
     },
     {
       "name": "Mike",
-      "avatar": "assets/images/mike.png",
+      "avatar": "assets/images/avatar_4.jpeg",
       "color": Colors.orange[50],
+    },
+    {
+      "name": "Emily",
+      "avatar": "assets/images/avatar_5.jpeg",
+      "color": Colors.green[50],
+    },
+    {
+      "name": "David",
+      "avatar": "assets/images/avatar_6.jpeg",
+      "color": Colors.yellow[50],
     },
   ];
 
@@ -73,7 +83,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                     CircleAvatar(
                       backgroundColor: Colors.blue[50],
                       child: IconButton(
-                        icon: const Icon(Icons.lock, color: Colors.blue),
+                        icon: const Icon(Icons.search, color: Colors.blue),
                         onPressed: () {},
                         padding: EdgeInsets.zero,
                       ),
@@ -151,7 +161,8 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   decoration: InputDecoration(
                     hintText: 'Type name/card/phone number/email',
                     hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                    suffixIcon: Icon(Icons.lock, color: Colors.blue, size: 20),
+                    suffixIcon:
+                        const Icon(Icons.search, color: Colors.blue, size: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[200]!),
@@ -183,7 +194,6 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                           children: [
                             CircleAvatar(
                               radius: 25,
-                              backgroundColor: recipient["color"],
                               backgroundImage: AssetImage(recipient["avatar"]),
                             ),
                             const SizedBox(height: 8),
