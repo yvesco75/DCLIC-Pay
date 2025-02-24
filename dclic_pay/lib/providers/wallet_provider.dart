@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../models/transaction.dart';
 import '../models/wallet.dart';
+import '../models/transaction.dart';
 
 class WalletProvider with ChangeNotifier {
   List<Wallet> _wallets = [];
