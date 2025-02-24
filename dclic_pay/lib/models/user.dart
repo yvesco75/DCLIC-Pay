@@ -1,43 +1,31 @@
 class User {
   final String id;
-  final String fullName;
+  final String name;
   final String email;
-  final String phoneNumber;
-  final String? avatar;
-  double balance;
-  List<String> cardIds;
+  final String imageUrl;
 
   User({
     required this.id,
-    required this.fullName,
+    required this.name,
     required this.email,
-    required this.phoneNumber,
-    this.avatar,
-    this.balance = 0.0,
-    this.cardIds = const [],
+    required this.imageUrl,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'fullName': fullName,
-      'email': email,
-      'phoneNumber': phoneNumber,
-      'avatar': avatar,
-      'balance': balance,
-      'cardIds': cardIds,
-    };
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      imageUrl: json['imageUrl'] as String,
+    );
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      id: map['id'],
-      fullName: map['fullName'],
-      email: map['email'],
-      phoneNumber: map['phoneNumber'],
-      avatar: map['avatar'],
-      balance: map['balance']?.toDouble() ?? 0.0,
-      cardIds: List<String>.from(map['cardIds'] ?? []),
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'imageUrl': imageUrl,
+    };
   }
 }

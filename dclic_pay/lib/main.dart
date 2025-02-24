@@ -1,100 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:water_drop_nav_bar/water_drop_nav_bar.dart';
+import 'package:provider/provider.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/main_screen.dart';
+import 'screens/profile_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/wallet_screen.dart';
 import 'screens/send_money_screen.dart';
-import 'screens/profil_screen.dart';
-import 'services/user_service.dart';
-import 'services/card_service.dart';
-import 'services/transaction_service.dart';
+import 'providers/auth_provider.dart';
+import 'providers/wallet_provider.dart';
+import 'utils/theme.dart';
+import 'utils/constants.dart';
 
-// Services globaux
-final userService = UserService();
-final cardService = CardService();
-final transactionService = TransactionService();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final authProvider = AuthProvider();
+  await authProvider.init();
 
-void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(create: (_) => WalletProvider()..init()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'DClic Pay',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      title: 'Money Transfer App',
+      theme: AppTheme.lightTheme,
+      home: Consumer<AuthProvider>(
+        builder: (context, auth, child) {
+          return auth.isAuthenticated
+              ? const MainScreen()
+              : const LoginScreen();
+        },
       ),
-      home: const MainScreen(),
-    );
-  }
-}
-
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const WalletScreen(),
-    const SendMoneyScreen(),
-    const ProfileScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: WaterDropNavBar(
-        backgroundColor: Colors.white,
-        waterDropColor: Colors.blue,
-        onItemSelected: _onItemTapped,
-        selectedIndex: _selectedIndex,
-        barItems: [
-          BarItem(
-            filledIcon: Icons.home,
-            outlinedIcon: Icons.home_outlined,
-          ),
-          BarItem(
-            filledIcon: Icons.account_balance_wallet,
-            outlinedIcon: Icons.account_balance_wallet_outlined,
-          ),
-          BarItem(
-            filledIcon: Icons.send,
-            outlinedIcon: Icons.send_outlined,
-          ),
-          BarItem(
-            filledIcon: Icons.person,
-            outlinedIcon: Icons.person_outline,
-          ),
-        ],
-      ),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignUpScreen(),
+        '/home': (context) => const MainScreen(),
+        '/wallet': (context) => const WalletScreen(),
+        '/send': (context) => const SendMoneyScreen(),
+        '/profile': (context) => const ProfileScreen(),
+      },
     );
   }
 }

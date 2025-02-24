@@ -5,37 +5,35 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.1
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.8
-  flutter_credit_card: ^4.0.1
-  lucide_icons: ^0.256.0
-  water_drop_nav_bar: 2.2.2
-  http: ^1.1.2  # Mise à jour
-  fl_chart: ^0.63.0
+  cupertino_icons: ^1.0.2
+  flutter_credit_card: ^4.0.1 # Mettez à jour vers la dernière version
+  intl: ^0.20.2 # Mettez à jour vers la dernière version
+  provider: ^6.1.2
   shared_preferences: ^2.2.2
-  intl: ^0.19.0  # Mise à jour
-  flutter_native_splash: ^2.3.10  # Ajout pour écran de démarrage
-  u_credit_card: ^1.4.0  
+  fl_chart: ^0.70.2 # Mettez à jour vers la dernière version
+  flutter_svg: ^2.0.7
+  fluttertoast: ^8.2.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^5.0.0 # Mettez à jour vers la dernière version
 
 flutter:
   uses-material-design: true
 
   assets:
-     - assets/images/1.png
-     - assets/images/2.png
-     - assets/images/3.png
-     - assets/images/avatar_1.jpeg
-     - assets/images/avatar_2.jpeg
-     - assets/images/avatar_3.jpeg
-     - assets/images/avatar_4.jpeg
-     - assets/images/avatar_5.jpeg
-     - assets/images/avatar_6.jpeg
+    - images/avatar_1.jpeg
+    - images/avatar_2.jpeg
+    - images/avatar_3.jpeg
+    - images/avatar_4.jpeg
+    - images/avatar_5.jpeg
+    - images/avatar_6.jpeg
+    - images/1.png
+    - images/2.png
+    - images/3.png
