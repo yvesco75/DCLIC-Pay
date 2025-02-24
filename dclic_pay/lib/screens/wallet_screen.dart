@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/wallet_provider.dart';
 import '../widgets/wallet_card.dart';
-import '../models/transaction.dart'; // Import du modèle Transaction
+import '../models/transaction.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({Key? key}) : super(key: key);
@@ -16,7 +16,6 @@ class _WalletScreenState extends State<WalletScreen> {
   int _selectedWalletIndex = 0;
   String _selectedTimeRange = 'Week';
 
-  // Fonction pour filtrer les transactions selon la période
   List<Transaction> _getFilteredTransactions(List<Transaction> transactions) {
     final now = DateTime.now();
     switch (_selectedTimeRange) {
@@ -44,28 +43,24 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  // Fonction pour générer les points du graphique
   List<FlSpot> _generateChartSpots(List<Transaction> transactions) {
     if (transactions.isEmpty) return [];
 
     final Map<int, double> dailyTotals = {};
     final filteredTransactions = _getFilteredTransactions(transactions);
 
-    // Regrouper les transactions par jour
     for (var transaction in filteredTransactions) {
       final transactionDate = DateTime.parse(transaction.timestamp);
       final day = transactionDate.day;
       dailyTotals[day] = (dailyTotals[day] ?? 0) + transaction.amount;
     }
 
-    // Créer les points pour le graphique
     return dailyTotals.entries
         .map((e) => FlSpot(e.key.toDouble(), e.value))
         .toList()
       ..sort((a, b) => a.x.compareTo(b.x));
   }
 
-  // Calculer les statistiques
   Map<String, double> _calculateStats(List<Transaction> transactions) {
     final filteredTransactions = _getFilteredTransactions(transactions);
 
@@ -171,31 +166,103 @@ class _WalletScreenState extends State<WalletScreen> {
                                 child: Text('No transactions for this period'))
                             : LineChart(
                                 LineChartData(
+                                  minY: 0,
+                                  maxY: 600,
                                   lineBarsData: [
                                     LineChartBarData(
                                       spots: spots,
                                       isCurved: true,
-                                      barWidth: 3,
+                                      barWidth: 2,
                                       color: Colors.blue,
-                                      dotData: FlDotData(show: true),
+                                      dotData: FlDotData(
+                                        show: true,
+                                        getDotPainter:
+                                            (spot, percent, barData, index) {
+                                          return FlDotCirclePainter(
+                                            radius: 4,
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                            strokeColor: Colors.blue,
+                                          );
+                                        },
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.blue.withOpacity(0.3),
+                                            Colors.blue.withOpacity(0.05),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: false,
+                                    horizontalInterval: 100,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
                                   titlesData: FlTitlesData(
+                                    rightTitles: AxisTitles(
+                                        sideTitles:
+                                            SideTitles(showTitles: false)),
+                                    topTitles: AxisTitles(
+                                        sideTitles:
+                                            SideTitles(showTitles: false)),
                                     leftTitles: AxisTitles(
                                       sideTitles: SideTitles(
                                         showTitles: true,
                                         reservedSize: 40,
+                                        getTitlesWidget: (value, meta) {
+                                          return Padding(
+                                            padding:
+                                                const EdgeInsets.only(right: 8),
+                                            child: Text(
+                                              '\$${value.toInt()}',
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                     bottomTitles: AxisTitles(
                                       sideTitles: SideTitles(
                                         showTitles: true,
                                         reservedSize: 22,
+                                        getTitlesWidget: (value, meta) {
+                                          const days = [
+                                            'Mon',
+                                            'Tue',
+                                            'Wed',
+                                            'Thu',
+                                            'Fri',
+                                            'Sat',
+                                            'Sun'
+                                          ];
+                                          final index = value.toInt() % 7;
+                                          return Text(
+                                            days[index],
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
-                                  gridData: FlGridData(show: true),
-                                  borderData: FlBorderData(show: true),
+                                  borderData: FlBorderData(show: false),
                                 ),
                               ),
                       ),
